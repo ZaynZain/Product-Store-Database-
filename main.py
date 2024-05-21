@@ -33,9 +33,11 @@ class ProductReview(db.Model):
     ProductID = db.Column(db.Integer, db.ForeignKey('Products.ProductID'))
     ReviewText = db.Column(db.Text)
     Rating = db.Column(db.DECIMAL(3, 2))
+    ReviewerName = db.Column(db.String(255))  # Add this line
     Date = db.Column(db.Date)
 
     product = db.relationship('Product', backref=db.backref('reviews', lazy=True))
+
 
 class ProductDetail(db.Model):
     __tablename__ = 'ProductDetails'
@@ -51,7 +53,6 @@ from flask import request, jsonify
 @app.route('/')
 def index():
     return render_template('index.html')
-
 @app.route('/add_product', methods=['POST'])
 def add_product():
     data = request.json
@@ -68,6 +69,7 @@ def add_product():
     source_name = data['source_name']
     review_text = data.get('review_text')  # Get review text if provided
     review_rating = data.get('review_rating')  # Get review rating if provided
+    reviewer_name = data.get('reviewer_name')  # Get reviewer name if provided
     detail_specification = data.get('detail_specification')  # Get detail specification if provided
     detail_value = data.get('detail_value')  # Get detail value if provided
 
@@ -107,7 +109,8 @@ def add_product():
         new_review = ProductReview(
             ProductID=new_product.ProductID,
             ReviewText=review_text,
-            Rating=review_rating
+            Rating=review_rating,
+            ReviewerName=reviewer_name  # Include reviewer name
         )
         db.session.add(new_review)
 
